@@ -1,5 +1,6 @@
 package com.soldiersofmobile.todoexpert;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +32,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+        if (BuildConfig.DEBUG) {
+            usernameEditText.setText("user");
+            passwordEditText.setText("pass");
+
+        }
 
     }
 
@@ -72,15 +78,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             protected String doInBackground(String... strings) {
 
-                for (int i = 0; i < 100; i++) {
-
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    publishProgress(i);
-                }
+//                for (int i = 0; i < 100; i++) {
+//
+//                    try {
+//                        Thread.sleep(50);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    publishProgress(i);
+//                }
 
                 boolean isLogged = loginCall(strings[0], strings[1]);
                 return isLogged ? null : "Login error";
@@ -100,6 +106,10 @@ public class LoginActivity extends AppCompatActivity {
                 loginButton.setEnabled(true);
                 if (error == null) {
                     finish();
+
+                    Intent intent = new Intent(LoginActivity.this, TodoListActivity.class);
+                    startActivity(intent);
+
                 } else {
                     Toast.makeText(LoginActivity.this, error, Toast.LENGTH_SHORT).show();
                 }
@@ -113,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean loginCall(String username, String password) {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(100);
             return username.equals("user") && password.equals("pass");
         } catch (InterruptedException e) {
             e.printStackTrace();
