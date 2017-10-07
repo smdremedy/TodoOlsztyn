@@ -3,6 +3,7 @@ package com.soldiersofmobile.todoexpert.api;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.Query;
 
 public interface TodoApi {
 
@@ -12,5 +13,6 @@ public interface TodoApi {
             "X-Parse-REST-API-Key: LCTpX53aBmbtIXOtFmDb9dklESKUd0q58hFbnRYc",
             "X-Parse-Revocable-Session: 1"
     })
-    Call<LoginResponse> getLogin(String username, String password);
+    Call<LoginResponse> getLogin(@Query("username") String username,
+                                 @Query("password") String password);
 }

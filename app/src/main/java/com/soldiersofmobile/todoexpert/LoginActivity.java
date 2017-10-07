@@ -1,17 +1,31 @@
 package com.soldiersofmobile.todoexpert;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.soldiersofmobile.todoexpert.api.LoginResponse;
+import com.soldiersofmobile.todoexpert.api.TodoApi;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -57,8 +71,54 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (!hasError) {
-            login(username, password);
+            //login(username, password);
+            loginWithRetrofit(username, password);
         }
+
+    }
+
+    private void loginWithRetrofit(String username, String password) {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addNetworkInterceptor(interceptor)
+                .build();
+
+
+        Retrofit.Builder builder = new Retrofit.Builder();
+        builder.client(client);
+        builder.baseUrl("https://parseapi.back4app.com");
+        builder.addConverterFactory(GsonConverterFactory.create());
+        Retrofit retrofit = builder.build();
+        TodoApi todoApi = retrofit.create(TodoApi.class);
+
+        Call<LoginResponse> loginResponseCall = todoApi.getLogin(username, password);
+
+        loginResponseCall.enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                if(response.isSuccessful()) {
+                    LoginResponse body = response.body();
+                    Log.d("TAG", body.toString());
+
+                    SharedPreferences sharedPreferences
+                            = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("token", body.sessionToken);
+                    editor.putString("userId", body.objectId);
+                    editor.apply();
+
+                } else {
+                    ResponseBody responseBody = response.errorBody();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+
+            }
+        });
+
 
     }
 
