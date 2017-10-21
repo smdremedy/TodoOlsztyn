@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:paddingLeft="@dimen/activity_vertical_padding"
         android:paddingRight="@dimen/activity_vertical_padding"
-        tools:context="com.soldiersofmobile.todoexpert.LoginActivity">
+        tools:context="com.soldiersofmobile.todoexpert.login.LoginActivity">
 
         <ImageView
             android:layout_width="wrap_content"

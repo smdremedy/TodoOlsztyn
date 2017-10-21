@@ -1,4 +1,4 @@
-package com.soldiersofmobile.todoexpert;
+package com.soldiersofmobile.todoexpert.login;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +12,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.soldiersofmobile.todoexpert.App;
+import com.soldiersofmobile.todoexpert.BuildConfig;
+import com.soldiersofmobile.todoexpert.R;
+import com.soldiersofmobile.todoexpert.TodoListActivity;
 import com.soldiersofmobile.todoexpert.api.LoginResponse;
 import com.soldiersofmobile.todoexpert.api.TodoApi;
 
@@ -39,10 +43,13 @@ public class LoginActivity extends AppCompatActivity {
     Button registerButton;
     @BindView(R.id.progress)
     ProgressBar progress;
+    private LoginManager loginManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        loginManager = ((App) getApplication()).getLoginManager();
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
@@ -97,17 +104,14 @@ public class LoginActivity extends AppCompatActivity {
         loginResponseCall.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     LoginResponse body = response.body();
                     Log.d("TAG", body.toString());
 
-                    SharedPreferences sharedPreferences
-                            = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("token", body.sessionToken);
-                    editor.putString("userId", body.objectId);
-                    editor.apply();
-
+                    loginManager.saveUserData(body.objectId, body.sessionToken);
+                    Intent intent = new Intent(LoginActivity.this, TodoListActivity.class);
+                    startActivity(intent);
+                    finish();
                 } else {
                     ResponseBody responseBody = response.errorBody();
                 }

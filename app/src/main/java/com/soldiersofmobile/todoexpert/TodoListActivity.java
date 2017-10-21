@@ -2,13 +2,18 @@ package com.soldiersofmobile.todoexpert;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.soldiersofmobile.todoexpert.login.LoginActivity;
+import com.soldiersofmobile.todoexpert.login.LoginManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,11 +24,21 @@ public class TodoListActivity extends AppCompatActivity {
     @BindView(R.id.todo_list)
     ListView todoList;
     private ArrayAdapter<String> adapter;
+    private LoginManager loginManager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        loginManager = ((App) getApplication()).getLoginManager();
+
+        if (!loginManager.isUserLogged()) {
+            goToLogin();
+            return;
+        }
+
+
         setContentView(R.layout.activity_todo_list);
         ButterKnife.bind(this);
 
@@ -33,6 +48,12 @@ public class TodoListActivity extends AppCompatActivity {
         todoList.setAdapter(adapter);
 
 
+    }
+
+    private void goToLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -70,7 +91,8 @@ public class TodoListActivity extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
+                        loginManager.logout();
+                        goToLogin();
                     }
                 });
                 builder.setNegativeButton("No", null);
