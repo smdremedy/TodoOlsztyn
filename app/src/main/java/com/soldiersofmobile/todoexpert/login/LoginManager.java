@@ -36,4 +36,8 @@ public class LoginManager {
         editor.apply();
 
     }
+
+    public String getUserId() {
+        return sharedPreferences.getString(USER_ID, "");
+    }
 }

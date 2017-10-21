@@ -18,6 +18,7 @@ public class Todo
     public String content;
     public boolean done;
     public String objectId;
+    public String userId;
 
     @Override
     public String toString() {

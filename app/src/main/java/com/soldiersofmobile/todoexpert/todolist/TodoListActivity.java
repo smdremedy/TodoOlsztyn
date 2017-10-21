@@ -22,8 +22,11 @@ import com.soldiersofmobile.todoexpert.R;
 import com.soldiersofmobile.todoexpert.Todo;
 import com.soldiersofmobile.todoexpert.api.TodoApi;
 import com.soldiersofmobile.todoexpert.api.TodosResponse;
+import com.soldiersofmobile.todoexpert.db.TodoDao;
 import com.soldiersofmobile.todoexpert.login.LoginActivity;
 import com.soldiersofmobile.todoexpert.login.LoginManager;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,6 +45,7 @@ public class TodoListActivity extends AppCompatActivity {
     private LoginManager loginManager;
 
     private TodoApi todoApi;
+    private TodoDao todoDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,7 @@ public class TodoListActivity extends AppCompatActivity {
         App application = (App) getApplication();
         loginManager = application.getLoginManager();
         todoApi = application.getTodoApi();
+        todoDao = application.getTodoDao();
 
         if (!loginManager.isUserLogged()) {
             goToLogin();
@@ -64,7 +69,10 @@ public class TodoListActivity extends AppCompatActivity {
 
         todoList.setAdapter(adapter);
 
-        loadTodos();
+        //TODO?
+        List<Todo> todos = todoDao.getTodos(loginManager.getUserId());
+        adapter.addAll(todos);
+
     }
 
     private void loadTodos() {
@@ -78,7 +86,9 @@ public class TodoListActivity extends AppCompatActivity {
                     TodosResponse todosResponse = response.body();
 
                     for (Todo result : todosResponse.results) {
+                        result.userId = loginManager.getUserId();
                         d(result.toString());
+                        todoDao.create(result);
 
                     }
                     adapter.addAll(todosResponse.results);
@@ -128,6 +138,7 @@ public class TodoListActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE);
                 return true;
             case R.id.action_refresh:
+                loadTodos();
                 return true;
             case R.id.action_logout:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
