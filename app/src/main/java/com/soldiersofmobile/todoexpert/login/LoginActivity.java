@@ -1,12 +1,9 @@
 package com.soldiersofmobile.todoexpert.login;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -15,21 +12,17 @@ import android.widget.Toast;
 import com.soldiersofmobile.todoexpert.App;
 import com.soldiersofmobile.todoexpert.BuildConfig;
 import com.soldiersofmobile.todoexpert.R;
-import com.soldiersofmobile.todoexpert.TodoListActivity;
+import com.soldiersofmobile.todoexpert.todolist.TodoListActivity;
 import com.soldiersofmobile.todoexpert.api.LoginResponse;
 import com.soldiersofmobile.todoexpert.api.TodoApi;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import timber.log.Timber;
 
 public class LoginActivity extends AppCompatActivity {

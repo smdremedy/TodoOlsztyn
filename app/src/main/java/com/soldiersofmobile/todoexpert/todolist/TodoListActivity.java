@@ -1,17 +1,25 @@
-package com.soldiersofmobile.todoexpert;
+package com.soldiersofmobile.todoexpert.todolist;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.soldiersofmobile.todoexpert.AddTodoActivity;
+import com.soldiersofmobile.todoexpert.App;
+import com.soldiersofmobile.todoexpert.R;
+import com.soldiersofmobile.todoexpert.Todo;
 import com.soldiersofmobile.todoexpert.api.TodoApi;
 import com.soldiersofmobile.todoexpert.api.TodosResponse;
 import com.soldiersofmobile.todoexpert.login.LoginActivity;
@@ -23,12 +31,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static timber.log.Timber.*;
+
 public class TodoListActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE = 123;
     @BindView(R.id.todo_list)
     ListView todoList;
-    private ArrayAdapter<String> adapter;
+    private TodoAdapter adapter;
     private LoginManager loginManager;
 
     private TodoApi todoApi;
@@ -50,8 +60,7 @@ public class TodoListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_todo_list);
         ButterKnife.bind(this);
 
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-        adapter.addAll("zadanie1", "zadanie2", "zadanie3");
+        adapter = new TodoAdapter();
 
         todoList.setAdapter(adapter);
 
@@ -65,6 +74,17 @@ public class TodoListActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<TodosResponse> call, Response<TodosResponse> response) {
 
+                if (response.isSuccessful()) {
+                    TodosResponse todosResponse = response.body();
+
+                    for (Todo result : todosResponse.results) {
+                        d(result.toString());
+
+                    }
+                    adapter.addAll(todosResponse.results);
+
+
+                }
             }
 
             @Override
@@ -94,7 +114,7 @@ public class TodoListActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Todo todo
                         = (Todo) data.getSerializableExtra("todo");
-                adapter.add(todo.content);
+                adapter.add(todo);
             }
         }
     }

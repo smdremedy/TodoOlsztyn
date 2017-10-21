@@ -6,11 +6,24 @@ public class Todo
         implements Serializable {
 
     public Todo(String content,
-                boolean isDone) {
+                boolean done) {
         this.content = content;
-        this.isDone = isDone;
+        this.done = done;
+    }
+
+    public Todo() {
+
     }
 
     public String content;
-    public boolean isDone;
+    public boolean done;
+    public String objectId;
+
+    @Override
+    public String toString() {
+        return "Todo{" +
+                "content='" + content + '\'' +
+                ", done=" + done +
+                '}';
+    }
 }
