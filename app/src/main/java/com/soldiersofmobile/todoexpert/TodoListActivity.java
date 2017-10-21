@@ -12,11 +12,16 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.soldiersofmobile.todoexpert.api.TodoApi;
+import com.soldiersofmobile.todoexpert.api.TodosResponse;
 import com.soldiersofmobile.todoexpert.login.LoginActivity;
 import com.soldiersofmobile.todoexpert.login.LoginManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TodoListActivity extends AppCompatActivity {
 
@@ -26,12 +31,15 @@ public class TodoListActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private LoginManager loginManager;
 
+    private TodoApi todoApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        loginManager = ((App) getApplication()).getLoginManager();
+        App application = (App) getApplication();
+        loginManager = application.getLoginManager();
+        todoApi = application.getTodoApi();
 
         if (!loginManager.isUserLogged()) {
             goToLogin();
@@ -47,6 +55,23 @@ public class TodoListActivity extends AppCompatActivity {
 
         todoList.setAdapter(adapter);
 
+        loadTodos();
+    }
+
+    private void loadTodos() {
+
+        Call<TodosResponse> call = todoApi.getTodos(loginManager.getToken());
+        call.enqueue(new Callback<TodosResponse>() {
+            @Override
+            public void onResponse(Call<TodosResponse> call, Response<TodosResponse> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<TodosResponse> call, Throwable t) {
+
+            }
+        });
 
     }
 

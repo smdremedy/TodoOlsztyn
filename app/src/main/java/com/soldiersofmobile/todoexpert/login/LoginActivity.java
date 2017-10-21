@@ -30,6 +30,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import timber.log.Timber;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -45,11 +46,16 @@ public class LoginActivity extends AppCompatActivity {
     ProgressBar progress;
     private LoginManager loginManager;
 
+    private TodoApi todoApi;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        loginManager = ((App) getApplication()).getLoginManager();
+        App application = (App) getApplication();
+        loginManager = application.getLoginManager();
+        todoApi = application.getTodoApi();
+
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
@@ -58,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
             passwordEditText.setText("pass");
 
         }
+
 
     }
 
@@ -85,19 +92,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginWithRetrofit(String username, String password) {
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addNetworkInterceptor(interceptor)
-                .build();
-
-
-        Retrofit.Builder builder = new Retrofit.Builder();
-        builder.client(client);
-        builder.baseUrl("https://parseapi.back4app.com");
-        builder.addConverterFactory(GsonConverterFactory.create());
-        Retrofit retrofit = builder.build();
-        TodoApi todoApi = retrofit.create(TodoApi.class);
 
         Call<LoginResponse> loginResponseCall = todoApi.getLogin(username, password);
 
@@ -106,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
                     LoginResponse body = response.body();
-                    Log.d("TAG", body.toString());
+                    Timber.d("Body:$s", body);
 
                     loginManager.saveUserData(body.objectId, body.sessionToken);
                     Intent intent = new Intent(LoginActivity.this, TodoListActivity.class);
