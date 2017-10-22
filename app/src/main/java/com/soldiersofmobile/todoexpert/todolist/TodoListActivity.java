@@ -1,7 +1,10 @@
 package com.soldiersofmobile.todoexpert.todolist;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -18,10 +21,12 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import com.soldiersofmobile.todoexpert.AddTodoActivity;
 import com.soldiersofmobile.todoexpert.App;
 import com.soldiersofmobile.todoexpert.R;
+import com.soldiersofmobile.todoexpert.RefreshIntentService;
 import com.soldiersofmobile.todoexpert.Todo;
 import com.soldiersofmobile.todoexpert.api.TodoApi;
 import com.soldiersofmobile.todoexpert.api.TodosResponse;
@@ -58,6 +63,28 @@ public class TodoListActivity extends AppCompatActivity {
     private TodoApi todoApi;
     private TodoDao todoDao;
 
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(TodoListActivity.this, "Refresh", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(receiver, new IntentFilter(RefreshIntentService.ACTION));
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +111,7 @@ public class TodoListActivity extends AppCompatActivity {
         adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             @Override
             public boolean setViewValue(View view, Cursor cursor, int index) {
-                if(index == cursor.getColumnIndex(TodoDao.C_DONE)) {
+                if (index == cursor.getColumnIndex(TodoDao.C_DONE)) {
                     CheckBox checkBox = (CheckBox) view;
                     boolean done = cursor.getInt(index) > 0;
                     checkBox.setChecked(done);
@@ -115,6 +142,8 @@ public class TodoListActivity extends AppCompatActivity {
                         result.userId = loginManager.getUserId();
                         d(result.toString());
                         todoDao.create(result);
+
+                        startService(new Intent(TodoListActivity.this, RefreshIntentService.class));
 
                     }
                     //adapter.addAll(todosResponse.results);
