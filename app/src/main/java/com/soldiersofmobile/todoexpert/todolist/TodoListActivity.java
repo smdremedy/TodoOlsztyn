@@ -68,6 +68,7 @@ public class TodoListActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(TodoListActivity.this, "Refresh", Toast.LENGTH_SHORT).show();
+            refresh();
         }
     };
 
@@ -126,6 +127,11 @@ public class TodoListActivity extends AppCompatActivity {
         List<Todo> todos = todoDao.getTodos(loginManager.getUserId());
         //adapter.addAll(todos);
 
+    }
+
+    private void refresh() {
+        Cursor cursor = todoDao.getTodosCursor(loginManager.getUserId());
+        adapter.swapCursor(cursor);
     }
 
     private void loadTodos() {
