@@ -36,6 +36,8 @@ import com.soldiersofmobile.todoexpert.login.LoginManager;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -58,10 +60,10 @@ public class TodoListActivity extends AppCompatActivity {
     ListView todoList;
     //private TodoAdapter adapter;
     private SimpleCursorAdapter adapter;
-    private LoginManager loginManager;
-
-    private TodoApi todoApi;
-    private TodoDao todoDao;
+    @Inject
+    LoginManager loginManager;
+    @Inject TodoApi todoApi;
+    @Inject TodoDao todoDao;
 
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -90,10 +92,7 @@ public class TodoListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        App application = (App) getApplication();
-        loginManager = application.getLoginManager();
-        todoApi = application.getTodoApi();
-        todoDao = application.getTodoDao();
+       App.getComponent(this).inject(this);
 
         if (!loginManager.isUserLogged()) {
             goToLogin();

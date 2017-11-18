@@ -2,12 +2,15 @@ package com.soldiersofmobile.todoexpert.login;
 
 import android.content.SharedPreferences;
 
+import javax.inject.Inject;
+
 public class LoginManager {
 
     public static final String TOKEN = "token";
     public static final String USER_ID = "userId";
     private SharedPreferences sharedPreferences;
 
+    @Inject
     public LoginManager(SharedPreferences sharedPreferences) {
         this.sharedPreferences = sharedPreferences;
     }

@@ -12,9 +12,14 @@ import android.widget.Toast;
 import com.soldiersofmobile.todoexpert.App;
 import com.soldiersofmobile.todoexpert.BuildConfig;
 import com.soldiersofmobile.todoexpert.R;
+import com.soldiersofmobile.todoexpert.di.AppComponent;
+import com.soldiersofmobile.todoexpert.di.AppModule;
+import com.soldiersofmobile.todoexpert.di.DaggerAppComponent;
 import com.soldiersofmobile.todoexpert.todolist.TodoListActivity;
 import com.soldiersofmobile.todoexpert.api.LoginResponse;
 import com.soldiersofmobile.todoexpert.api.TodoApi;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,17 +42,18 @@ public class LoginActivity extends AppCompatActivity {
     Button registerButton;
     @BindView(R.id.progress)
     ProgressBar progress;
-    private LoginManager loginManager;
 
-    private TodoApi todoApi;
+    @Inject
+    LoginManager loginManager;
+    @Inject
+    TodoApi todoApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        App.getComponent(this).inject(this);
 
-        App application = (App) getApplication();
-        loginManager = application.getLoginManager();
-        todoApi = application.getTodoApi();
+        LoginManager loginManager = App.getComponent(this).getLoginManager();
 
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
